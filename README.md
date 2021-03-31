@@ -159,7 +159,7 @@ There are two booleans that I used during this challenge.
 string-length(//user[position()=1]/child::node()[position()=2])=6 
 substring((//user[position()=1]/child::node()[position()=2]),1,1)="a"
 ```
-Breaking down the first command, it basically checks if the length of the string in the `user` table at position [1,2] is 6.
+Breaking down the first command, it basically checks if the length of the string in the `user` table at position [1,2] is 6. <br />
 Breaking down the second command, it checks takes the first character of the string in the `user` table at position [1,2] is "a".
 
 A couple things to note about this is that indexes in XPath start with 1 and not 0, and that the substring method works like this:
