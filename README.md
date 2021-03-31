@@ -13,7 +13,7 @@ http://mercury.picoctf.net:50970/
 
 Basically what it wants you to do is to upload 2 different PDF files with the same MD5 Hash. There are different files out there that contain the same MD5 hash, just google them.  To upload them as a pdf, all you have to do is change the file extension.  It won't affect the MD5 hash, but it will be verified as a PDF as their PHP only checks file extensions.  
 The files I used are uploaded as birthday1 and 2 in this repo.
-
+<br />
 ## Super Serial
 
 **Challenge Link**
@@ -44,7 +44,7 @@ After taking the code and messing around with it in some online php compiler (I 
 O:10:"access_log":1:{s:8:"log_file";s:7:"../flag";}
 ```
 Base64 encode it and stick it into the login cookie, and navigate to `authentication.php`, and you get your flag!
-
+<br />
 ## Most Cookies
 
 **Challenge Link**
@@ -81,5 +81,50 @@ Afterwards, you can just run the following command to sign your own cookie that 
  ```
  
  Stick that value into the session cookie on the website, and reload to find the flag!
- 
- 
+ <br />
+ ## Web Gauntlet 2/3
+
+**Challenge Link**
+
+http://mercury.picoctf.net:35178/ - Web Gauntlet 2
+http://mercury.picoctf.net:32946/ - Web Gauntlet 3
+
+<br />
+
+**Solution**
+In these two problems, the filters are the exact same. The only difference is the length limit, so the following solution will work for both problems.  If you can't go to filter.php after solving, try refreshing your cookies or doing it in incognito.
+
+In both of these problems, we can find the filter at `/filter.php`.  In there we find that each of the following operators are filtered:
+
+```
+Filters: or and true false union like = > < ; -- /* */ admin
+```
+They happen to print the sql query when you try logging in with anything, so we find that the query is
+```
+SELECT username, password FROM users WHERE username='[insert stuff here]' AND password='[insert stuff here]'
+```
+
+There is also a character limit of 25 total characters (35 for Web Gauntlet 3) for username + password added together.  To solve this problem, we need to look at the sqlite operators that are not filtered, which are listed at: 
+```
+https://www.tutorialspoint.com/sqlite/sqlite_operators.htm
+```
+First things first, we need to find a way to get admin to not be filtered.  Fortunately they haven't banned `||` which is concatenates strings in sqlite.  We can get the string admin by just putting `adm'||'in`.
+
+Next, we need to find a way to bypass the password checking.  We see that they haven't filtered any of the binary operators, which also happen to be 1 character long.  We can use these, especially the `| (binary or operator)` to bypass the password checking.
+
+We can also use `is` and `is not` to replace `=` and `!=`.
+
+From this I created the inputs:
+Username: `adm'||'in`
+Password: `' | '' IS '`
+Which would query: `SELECT username, password FROM users WHERE username='adm'||'in' AND password='' | '' IS ''`
+
+However for some reason this didn't seem to work.  I opened up an online sqlite compiler at `https://sqliteonline.com/` to do some more testing, and found that for some reason the | operator would return true if I put `'' IS NOT ''`.  So I replaced `IS` with `IS NOT` in the query, and it worked!
+
+Final Input:
+Username: `adm'||'in`
+Password: `' | '' IS NOT '`
+Which would query: `SELECT username, password FROM users WHERE username='adm'||'in' AND password='' | '' IS NOT ''`
+
+Which happens to be exactly 25 characters long.
+Navigate to filter.php to find the flag afterwards.
