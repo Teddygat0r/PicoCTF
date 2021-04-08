@@ -6,7 +6,7 @@ Ctf At: https://play.picoctf.org/ - PicoGym
 
 **Challenge Link**
 
-http://mercury.picoctf.net:50970/
+http://mercury.picoctf.net:50970/ (Pico may change)
 <br />
 
 **Solution**
@@ -18,7 +18,7 @@ The files I used are uploaded as birthday1 and 2 in this repo.
 
 **Challenge Link**
 
-http://mercury.picoctf.net:3449/
+http://mercury.picoctf.net:3449/ (Pico may change)
 <br />
 
 **Solution**
@@ -49,7 +49,7 @@ Base64 encode it and stick it into the login cookie, and navigate to `authentica
 
 **Challenge Link**
 
-http://mercury.picoctf.net:18835/
+http://mercury.picoctf.net:18835/ (Pico may change)
 <br />
 
 **Solution**
@@ -86,8 +86,8 @@ Afterwards, you can just run the following command to sign your own cookie that 
 
 **Challenge Link**
 
-http://mercury.picoctf.net:35178/ - Web Gauntlet 2<br />
-http://mercury.picoctf.net:32946/ - Web Gauntlet 3
+http://mercury.picoctf.net:35178/ - Web Gauntlet 2 (Pico may change)<br />
+http://mercury.picoctf.net:32946/ - Web Gauntlet 3 (Pico may change)
 
 <br />
 
@@ -136,7 +136,7 @@ Navigate to filter.php to find the flag afterwards.
 
 **Challenge Link**
 
-http://mercury.picoctf.net:16521/
+http://mercury.picoctf.net:16521/ (Pico may change)
 <br />
 
 **Solution**
